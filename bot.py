@@ -4,7 +4,6 @@ from datetime import datetime
 import time
 import pandas
 
-import test2
 
 BOTTOKEN = "8327175837:AAE_PDIkfU1yOrMoGxx1vRFFcGj_zZ2kVAE"
 
@@ -64,12 +63,6 @@ def cmdNotice(m):
 def cmdUnsub(m):
     users.discard(m.chat.id)
     bot.send_message(m.chat.id, "Вы отписались от уведомлений 👹👹👹👹👹👹👹")
-
-@bot.message_handler(commands=['parser'])
-def parser(m):
-    prompt = m.text.partition(' ')[2].strip()
-    result = test2.dns_search_uc(prompt)
-    bot.send_message(m.chat.id, result)
 
 def setNotification(user):
     today_weekday = 3 #datetime.today().weekday() + 1
