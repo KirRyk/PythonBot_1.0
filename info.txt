@@ -1,0 +1,26 @@
+"runwayml/stable-diffusion-v1-5"     # Старый, проверенный
+"black-forest-labs/FLUX.1-schnell"   # Новый, быстрый
+"stabilityai/stable-diffusion-xl-1.0" # Качественный, тяжелый
+
+"microsoft/DialoGPT-medium"          # Для диалогов
+"microsoft/codebert-base"            # Для программирования
+"dbmdz/bert-base-german-cased"       # Для немецкого языка
+"nlpconnect/vit-gpt2-image-captioning" # Для описания картинок
+
+"bert-base-uncased"                  # На английской Википедии
+"bert-base-chinese"                  # На китайских текстах
+"cardiffnlp/twitter-roberta-base"    # На твитах
+
+# Реалистичные изображения
+"runwayml/stable-diffusion-v1-5"           # Универсальный
+"stabilityai/stable-diffusion-2-1"         # Более качественный
+
+# Аниме/арт стиль
+"22h/vintedois-diffusion-v0-1"             # Стиль аниме
+"hakurei/waifu-diffusion"                  # Специально для аниме
+
+# Фотографии
+"prompthero/openjourney-v4"                # Фотореалистичный
+
+# Быстрые модели
+"black-forest-labs/FLUX.1-schnell"         # Очень быстрый
