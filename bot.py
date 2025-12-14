@@ -7,12 +7,14 @@ import random
 import requests
 from urllib.parse import quote_plus
 import test2
+import os
+BOTTOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '8327175837:AAE_PDIkfU1yOrMoGxx1vRFFcGj_zZ2kVAE')
+import signal
+import sys
 
-BOTTOKEN = "8327175837:AAE_PDIkfU1yOrMoGxx1vRFFcGj_zZ2kVAE"
+bot = TeleBot(BOTTOKEN)  # связь с ботом
 
-bot = TeleBot(BOTTOKEN) #связь с ботом
-
-users = set() # Множество chat.id, подписавшихся на уведомления
+users = set()  # Множество chat.id, подписавшихся на уведомления
 
 days_of_week = {
     1: "Понедельник",
@@ -24,11 +26,23 @@ days_of_week = {
     7: "Воскресенье",
 }
 
+
+# Обработчик сигналов для корректного завершения
+def signal_handler(signum, frame):
+    print(f"Получен сигнал {signum}, завершаю работу...")
+    sys.exit(0)
+
+
+signal.signal(signal.SIGTERM, signal_handler)
+signal.signal(signal.SIGINT, signal_handler)
+
+
 @bot.message_handler(commands=['start'])
 def cmdStart(m):
     bot.send_sticker(m.chat.id, "CAACAgIAAxkBAAEP2slpI0DrHa3__oA7XIca2GC9IVneDgACAUMAAvPmMEpciaGmXWWHBzYE")
     bot.send_message(m.chat.id, "Привет! \n"
-                     "Напиши /info для продолжения")
+                                "Напиши /info для продолжения")
+
 
 @bot.message_handler(commands=['info'])
 def cmdInfo(m):
@@ -58,7 +72,6 @@ def cmdInfo(m):
                                 '/parser - подборка товаров электроники', reply_markup=klava2)
 
 
-
 @bot.message_handler(commands=["image"])
 def sendImg(m):
     prompt = m.text.partition(' ')[2].strip()
@@ -69,11 +82,13 @@ def sendImg(m):
     res = requests.get(url, timeout=90, allow_redirects=True)
     bot.send_photo(m.chat.id, res.content)
 
+
 @bot.message_handler(commands=['parser'])
 def parser(m):
     prompt = m.text.partition(' ')[2].strip()
     result = test2.dns_search_uc(prompt)
     bot.send_message(m.chat.id, result)
+
 
 # ------------------------------------------
 
@@ -82,16 +97,19 @@ def cmdNotice(m):
     users.add(m.chat.id)
     bot.send_message(m.chat.id, "Теперь вы будете получать уведомления из расписания 👹👹")
 
+
 @bot.message_handler(commands=['unsub'])
 def cmdUnsub(m):
     users.discard(m.chat.id)
     bot.send_message(m.chat.id, "Вы отписались от уведомлений 👹👹👹👹👹👹👹")
 
+
 def setNotification(user):
-    today_weekday = 3 #datetime.today().weekday() + 1
+    today_weekday = 3  # datetime.today().weekday() + 1
 
     if today_weekday == 6 or today_weekday == 7:
-        bot.send_message(user, "Сегодня выходной, ура! Ты выжил! Но не расслабляйся: через мгновенье эта нечисть вновь придёт - понедельник...")
+        bot.send_message(user,
+                         "Сегодня выходной, ура! Ты выжил! Но не расслабляйся: через мгновенье эта нечисть вновь придёт - понедельник...")
 
     df = pandas.read_excel("shedule.xlsx")
 
@@ -113,6 +131,7 @@ def setNotification(user):
 
     bot.send_message(user, responce)
 
+
 def check_time():
     while True:
         now = datetime.now()
@@ -126,12 +145,22 @@ def check_time():
 
 def notification():
     scheduler_thread = threading.Thread(target=check_time)
-    scheduler_thread.daemon = True # Фоновый поток
+    scheduler_thread.daemon = True  # Фоновый поток
     scheduler_thread.start()
 
 
 if __name__ == "__main__":
-    print("Бот запущен...")
-    notification()  # Запуск фоновых уведомлений
-    bot.infinity_polling()
+    print("=" * 50)
+    print("Telegram Bot запущен на Render.com")
+    print(f"Токен: {BOTTOKEN[:10]}...")
+    print(f"Текущее время: {datetime.now()}")
+    print("=" * 50)
 
+    notification()  # Запуск фоновых уведомлений
+
+    try:
+        bot.infinity_polling(timeout=20, long_polling_timeout=10)
+    except Exception as e:
+        print(f"Ошибка в основном потоке: {e}")
+        print("Перезапуск через 10 секунд...")
+        time.sleep(10)
