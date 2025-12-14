@@ -85,9 +85,42 @@ def sendImg(m):
 
 @bot.message_handler(commands=['parser'])
 def parser(m):
+    # Получаем запрос после команды
     prompt = m.text.partition(' ')[2].strip()
-    result = test2.dns_search_uc(prompt)
-    bot.send_message(m.chat.id, result)
+
+    if not prompt:
+        bot.send_message(m.chat.id, "⚠️ Пожалуйста, укажите что искать:\n"
+                                    "Пример: `/parser iPhone 15`", parse_mode='Markdown')
+        return
+
+    # Отправляем сообщение о начале поиска
+    msg = bot.send_message(m.chat.id, f"🔍 Ищу товары по запросу: *{prompt}*...",
+                           parse_mode='Markdown')
+
+    try:
+        # Ищем товары
+        search_results = test2.dns_search_uc(prompt)
+
+        # Форматируем результаты
+        formatted_message = test2.format_results_for_telegram(search_results, prompt)
+
+        # Отправляем результаты
+        bot.edit_message_text(
+            chat_id=m.chat.id,
+            message_id=msg.message_id,
+            text=formatted_message,
+            parse_mode='Markdown',
+            disable_web_page_preview=False  # Разрешаем превью ссылок
+        )
+
+    except Exception as e:
+        error_msg = f"❌ Произошла ошибка при поиске:\n```{str(e)}```"
+        bot.edit_message_text(
+            chat_id=m.chat.id,
+            message_id=msg.message_id,
+            text=error_msg,
+            parse_mode='Markdown'
+        )
 
 
 # ------------------------------------------
