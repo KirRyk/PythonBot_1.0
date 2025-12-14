@@ -6,6 +6,7 @@ import pandas
 import random
 import requests
 from urllib.parse import quote_plus
+import test2
 
 BOTTOKEN = "8327175837:AAE_PDIkfU1yOrMoGxx1vRFFcGj_zZ2kVAE"
 
@@ -68,6 +69,13 @@ def sendImg(m):
     res = requests.get(url, timeout=90, allow_redirects=True)
     bot.send_photo(m.chat.id, res.content)
 
+@bot.message_handler(commands=['parser'])
+def parser(m):
+    prompt = m.text.partition(' ')[2].strip()
+    result = test2.dns_search_uc(prompt)
+    bot.send_message(m.chat.id, result)
+
+# ------------------------------------------
 
 @bot.message_handler(commands=['notice'])
 def cmdNotice(m):
@@ -108,7 +116,7 @@ def setNotification(user):
 def check_time():
     while True:
         now = datetime.now()
-        if now.hour == 20 and now.minute == 58 or now.hour == 7 and now.minute == 0:
+        if now.hour == 19 and now.minute == 25 or now.hour == 19 and now.minute == 35:
             for user in list(users):
                 setNotification(user)
             time.sleep(65)
